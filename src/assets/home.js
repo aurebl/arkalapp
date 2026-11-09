@@ -37,7 +37,9 @@
     } else {
       // Mobile : l'orbe occupe la place laissée au-dessus du texte (le pied de page peut passer sous la ligne de flottaison).
       L.R = Math.min(MOBILE_MAX_R, MOBILE_R * L.w, Math.max(80, (sr.height - MOBILE_GAP) / 2));
-      L.cy = bottom - MOBILE_GAP - L.R;
+      // Descendue si besoin pour ne pas être coupée par le haut de l'écran (forme ondulée ≈ 1,15 × R),
+      // quitte à chevaucher légèrement le titre.
+      L.cy = Math.max(bottom - MOBILE_GAP - L.R, sr.top - cr.top + 1.15 * L.R + 12);
     }
     L.cx = sr.left + sr.width / 2 - cr.left;
     stage.style.setProperty('--orb-b', `${(bottom - L.cy).toFixed(1)}px`);
