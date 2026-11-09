@@ -137,13 +137,15 @@ function head({ lang, page, title, description, extra = '' }) {
 <meta property="og:title" content="${esc(title)}">
 <meta property="og:description" content="${esc(description)}">
 <meta property="og:url" content="${url}">
-<meta property="og:image" content="${SITE_URL}/og-image.png">
-<meta property="og:image:width" content="1200">
-<meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="Arkal">
+<meta property="og:image" content="${SITE_URL}/og-image-${lang}.jpg">
+<meta property="og:image:type" content="image/jpeg">
+<meta property="og:image:width" content="2000">
+<meta property="og:image:height" content="1050">
+<meta property="og:image:alt" content="${esc(`Arkal — ${t.home.h1}`)}">
 <meta property="og:locale" content="${t.locale}">
 <meta property="og:locale:alternate" content="${TEXT[other].locale}">
 <meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="${SITE_URL}/og-image-${lang}.jpg">
 <meta name="theme-color" content="#000000">
 <meta name="color-scheme" content="dark">
 <link rel="icon" href="/favicon.png" type="image/png" sizes="48x48">
