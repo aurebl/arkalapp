@@ -43,6 +43,19 @@ const shareImage = (lang) => {
   return `${SITE_URL}/${name}?v=${v}`;
 };
 
+// Dimensions d'un JPEG (lues dans l'en-tête), pour les annoncer aux réseaux sociaux.
+function jpegSize(file) {
+  const b = readFileSync(file);
+  for (let i = 2; i < b.length; ) {
+    const marker = b[i + 1];
+    if (marker >= 0xc0 && marker <= 0xcf && ![0xc4, 0xc8, 0xcc].includes(marker)) {
+      return { height: b.readUInt16BE(i + 5), width: b.readUInt16BE(i + 7) };
+    }
+    i += 2 + b.readUInt16BE(i + 2);
+  }
+  return { width: 1200, height: 630 };
+}
+
 // ---------- Markdown (sous-ensemble utilisé par les pages légales) ----------
 
 const MONTHS_FR = { January: 'janvier', February: 'février', March: 'mars', April: 'avril', May: 'mai', June: 'juin', July: 'juillet', August: 'août', September: 'septembre', October: 'octobre', November: 'novembre', December: 'décembre' };
@@ -155,8 +168,8 @@ function head({ lang, page, title, description, extra = '' }) {
 <meta property="og:url" content="${url}">
 <meta property="og:image" content="${shareImage(lang)}">
 <meta property="og:image:type" content="image/jpeg">
-<meta property="og:image:width" content="2000">
-<meta property="og:image:height" content="1050">
+<meta property="og:image:width" content="${jpegSize(join(SRC, 'public', `og-image-${lang}.jpg`)).width}">
+<meta property="og:image:height" content="${jpegSize(join(SRC, 'public', `og-image-${lang}.jpg`)).height}">
 <meta property="og:image:alt" content="${esc(`Arkal — ${t.home.h1}`)}">
 <meta property="og:locale" content="${t.locale}">
 <meta property="og:locale:alternate" content="${TEXT[other].locale}">

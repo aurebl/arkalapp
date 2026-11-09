@@ -31,7 +31,7 @@ Les icônes sont générées à partir de l'icône de l'app (`src/app-icon.jpg`,
 | `src/public/favicon.png` | 48 × 48 | onglet du navigateur |
 | `src/public/apple-touch-icon.png` | 180 × 180 | raccourci sur l'écran d'accueil iPhone |
 | `src/public/icon-192.png`, `icon-512.png` | 192 et 512 | Android, onglet en haute définition |
-| `src/public/og-image-en.jpg`, `og-image-fr.jpg` | 2000 × 1050 | aperçu lors d'un partage (WhatsApp, LinkedIn…), une image par langue |
+| `src/public/og-image-en.jpg`, `og-image-fr.jpg` | 2400 × 1260 (format 1,91:1) | aperçu lors d'un partage (WhatsApp, LinkedIn…), une image par langue |
 
 ## Prévisualiser sur ton ordinateur
 
