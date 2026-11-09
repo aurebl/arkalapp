@@ -99,6 +99,7 @@ a {
 /* ---------- Accueil ---------- */
 
 .home {
+  position: relative;
   /* Espace boutons → pied de page : 96 px, réduit quand la hauteur d'écran manque. */
   --foot-gap: clamp(40px, calc(100vh - 824px), 96px);
   min-height: 100vh;
@@ -119,7 +120,7 @@ a {
 }
 
 .orb-canvas {
-  position: fixed;
+  position: absolute;
   inset: 0;
   z-index: 1;
   display: block;
@@ -136,7 +137,7 @@ a {
 /* Repli sans WebGL : dégradé radial statique aux couleurs de l'orbe. */
 .orb-fallback {
   display: none;
-  position: fixed;
+  position: absolute;
   z-index: 1;
   left: var(--orb-x, 50%);
   top: var(--orb-y, 30%);
@@ -410,8 +411,14 @@ a {
     width: 100%;
     max-width: none;
   }
+  /* L'accueil (orbe, texte, boutons) remplit l'écran ; le pied de page est juste en dessous. */
+  .hero {
+    min-height: 100vh;
+    min-height: 100svh;
+    padding-bottom: 24px;
+  }
   .home .footer {
-    padding-top: 40px;
+    padding-top: 16px;
   }
 }
 

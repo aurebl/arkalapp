@@ -8,7 +8,8 @@
   const mqMobile = matchMedia('(max-width: 767px)');
 
   const BASE_R = 187; // rayon de base de l'orbe sur desktop (170 + 10 %)
-  const MOBILE_R = 0.374; // rayon max sur mobile, en part de la largeur d'écran (34 % + 10 %)
+  const MOBILE_R = 0.561; // rayon max sur mobile, en part de la largeur d'écran (34 % + 10 %, puis + 50 %)
+  const MOBILE_MAX_R = 280;
   const DESKTOP_GAP = 50; // espace entre le bas de l'orbe et le titre sur desktop
   const MOBILE_GAP = 40; // espace entre le bas de l'orbe et le titre sur mobile
   const P = { speed: 1.75, morph: 7, amp: 2, glow: 2, period: 4.375, rings: 1 }; // un battement toutes les period / speed = 2,5 s
@@ -18,25 +19,28 @@
   // Rend :active fonctionnel sur iOS (effet d'appui des boutons).
   document.addEventListener('touchstart', () => {}, { passive: true });
 
-  // ---------- Mise en page : position et taille de l'orbe (px CSS, repère de l'écran) ----------
+  // ---------- Mise en page : position et taille de l'orbe (px CSS, repère du canvas, qui couvre toute la page) ----------
 
   const L = { w: 0, h: 0, cx: 0, cy: 0, R: BASE_R };
 
   function layout() {
     L.w = canvas.clientWidth || innerWidth;
     L.h = canvas.clientHeight || innerHeight;
+    const cr = canvas.getBoundingClientRect();
     const sr = stage.getBoundingClientRect();
+    const bottom = sr.bottom - cr.top;
     if (!mqMobile.matches) {
       // Desktop : l'orbe est réduite si la hauteur d'écran manque.
       const s = Math.min(1, Math.max(0.55, (sr.height - DESKTOP_GAP - 24) / (2 * BASE_R)));
       L.R = BASE_R * s;
-      L.cy = sr.bottom - DESKTOP_GAP - L.R;
+      L.cy = bottom - DESKTOP_GAP - L.R;
     } else {
-      L.R = Math.min(BASE_R, MOBILE_R * L.w, Math.max(80, (sr.height - MOBILE_GAP - 24) / 2));
-      L.cy = sr.bottom - MOBILE_GAP - L.R;
+      // Mobile : l'orbe occupe la place laissée au-dessus du texte (le pied de page peut passer sous la ligne de flottaison).
+      L.R = Math.min(MOBILE_MAX_R, MOBILE_R * L.w, Math.max(80, (sr.height - MOBILE_GAP) / 2));
+      L.cy = bottom - MOBILE_GAP - L.R;
     }
-    L.cx = sr.left + sr.width / 2;
-    stage.style.setProperty('--orb-b', `${(sr.bottom - L.cy).toFixed(1)}px`);
+    L.cx = sr.left + sr.width / 2 - cr.left;
+    stage.style.setProperty('--orb-b', `${(bottom - L.cy).toFixed(1)}px`);
     root.style.setProperty('--orb-x', `${L.cx}px`);
     root.style.setProperty('--orb-y', `${L.cy}px`);
     root.style.setProperty('--orb-r', `${L.R}px`);
@@ -348,7 +352,6 @@ void main(){
     ro.observe(canvas);
   }
   window.addEventListener('resize', schedule);
-  window.addEventListener('scroll', schedule, { passive: true });
   document.addEventListener('visibilitychange', () => loop(!document.hidden));
 
   resize();
