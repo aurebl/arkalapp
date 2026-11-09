@@ -1,5 +1,7 @@
-// Page d'accueil : orbe WebGL (même shader que le splash screen de l'app).
+// Page d'accueil : orbe WebGL (même shader que le splash screen de l'app) et son de l'app.
 // L'apparition en fondu (orbe, logo, puis texte) est gérée en CSS via la classe `is-ready`.
+import { ArkalSound } from './arkal-sound.js';
+
 (() => {
   const root = document.documentElement;
   const canvas = document.querySelector('.orb-canvas');
@@ -330,6 +332,42 @@ void main(){
     hitT0 = performance.now() / 1000;
     omni = Math.hypot(dx, dy) < 0.35 * L.R;
     hitA = omni ? 0 : Math.atan2(dy, dx);
+    if (!sound.muted) sound.triggerBeat();
+  });
+
+  // ---------- Son ----------
+
+  let muted = false;
+  try {
+    muted = localStorage.getItem('arkal-muted') === '1';
+  } catch (e) {}
+  const sound = new ArkalSound({ muted });
+
+  // L'ambiance démarre à la première interaction. Sur iPhone, un toucher n'autorise le son qu'au
+  // relâchement (pointerup / touchend / click) : on écoute donc aussi ces événements.
+  const unlockEvents = ['pointerdown', 'pointerup', 'touchend', 'click', 'keydown'];
+  const firstInteraction = () => {
+    if (!sound.muted) sound.unlock();
+    if (sound.ctx && sound.ctx.state === 'running') {
+      unlockEvents.forEach((ev) => window.removeEventListener(ev, firstInteraction, true));
+    }
+  };
+  unlockEvents.forEach((ev) => window.addEventListener(ev, firstInteraction, { capture: true, passive: true }));
+
+  const soundButton = document.querySelector('.sound-toggle');
+  const renderSoundButton = () => {
+    soundButton.setAttribute('aria-pressed', String(sound.muted));
+    soundButton.setAttribute('aria-label', sound.muted ? soundButton.dataset.labelUnmute : soundButton.dataset.labelMute);
+  };
+  renderSoundButton();
+  soundButton.addEventListener('click', () => {
+    const m = !sound.muted;
+    sound.setMuted(m);
+    if (!m) sound.unlock();
+    try {
+      localStorage.setItem('arkal-muted', m ? '1' : '0');
+    } catch (e) {}
+    renderSoundButton();
   });
 
   // ---------- Démarrage ----------
@@ -354,7 +392,11 @@ void main(){
     ro.observe(canvas);
   }
   window.addEventListener('resize', schedule);
-  document.addEventListener('visibilitychange', () => loop(!document.hidden));
+  document.addEventListener('visibilitychange', () => {
+    loop(!document.hidden);
+    if (document.hidden) sound.pause();
+    else sound.resume();
+  });
 
   resize();
   const fonts = document.fonts

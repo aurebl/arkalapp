@@ -26,6 +26,7 @@ export const TEXT = {
     switchLabel: 'Français',
     back: '← Arkal',
     footer: { contact: 'Contact', terms: 'Terms', privacy: 'Privacy' },
+    sound: { mute: 'Mute sound', unmute: 'Unmute sound' },
     home: {
       title: 'Arkal — Binaural beats for sleep, focus and relaxation',
       description: 'Binaural beats to sleep better, stay focused and unwind, in just a few minutes a day.',
@@ -53,6 +54,7 @@ export const TEXT = {
     switchLabel: 'English',
     back: '← Arkal',
     footer: { contact: 'Contact', terms: 'Conditions', privacy: 'Confidentialité' },
+    sound: { mute: 'Couper le son', unmute: 'Activer le son' },
     home: {
       title: 'Arkal — Sons binauraux pour dormir, se concentrer et se détendre',
       description: 'Des sons binauraux pour mieux dormir, rester concentré et vous détendre, en quelques minutes par jour.',

@@ -25,10 +25,15 @@ function write(path, content) {
 const fileFor = (route) => (route.endsWith('/') ? `${route}index.html` : `${route}.html`).slice(1);
 
 // Empreinte des fichiers CSS/JS pour forcer le rechargement après une mise à jour.
-const assetVersion = {};
-for (const name of readdirSync(join(SRC, 'assets'))) {
-  assetVersion[name] = createHash('sha1').update(readFileSync(join(SRC, 'assets', name))).digest('hex').slice(0, 8);
-}
+// home.js importe arkal-sound.js : l'import reçoit l'empreinte du son, puis home.js la sienne.
+const hash = (data) => createHash('sha1').update(data).digest('hex').slice(0, 8);
+const assetFiles = {};
+for (const name of readdirSync(join(SRC, 'assets'))) assetFiles[name] = readFileSync(join(SRC, 'assets', name));
+const assetVersion = { 'arkal-sound.js': hash(assetFiles['arkal-sound.js']) };
+assetFiles['home.js'] = Buffer.from(
+  assetFiles['home.js'].toString().replace("'./arkal-sound.js'", `'./arkal-sound.js?v=${assetVersion['arkal-sound.js']}'`),
+);
+for (const name of Object.keys(assetFiles)) assetVersion[name] ??= hash(assetFiles[name]);
 const asset = (name) => `/assets/${name}?v=${assetVersion[name]}`;
 
 // Image de partage d'une langue, avec empreinte : les réseaux sociaux rechargent l'aperçu quand elle change.
@@ -123,6 +128,10 @@ const ICON_APPLE = `<svg class="store-icon" width="24" height="24" viewBox="0 0 
 
 const ICON_PLAY = `<svg class="store-icon" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M10.91 11.9998L4.03003 18.5898V5.4198L10.91 11.9998V11.9998ZM11.99 10.9598L15.32 7.76978L7.22998 3.32977C6.91998 3.12977 6.51999 3.02979 6.10999 3.02979C5.45999 3.02979 4.85997 3.31978 4.46997 3.76978L11.98 10.9598H11.99ZM11.99 13.0398L4.46002 20.2498C4.85002 20.7198 5.43999 21.0298 6.10999 21.0298C6.51999 21.0298 6.86999 20.9298 7.17999 20.7298L15.37 16.2698L11.99 13.0298V13.0398ZM19.86 10.2598L16.7 8.52979L13.07 11.9998L16.75 15.5198L19.9 13.7998C20.56 13.4598 21.02 12.7698 21.02 12.0298C20.97 11.2898 20.51 10.5998 19.85 10.2598H19.86Z"/></svg>`;
 
+const ICON_SOUND_ON = `<svg class="sound-on" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 9.5h3.2l4.8-4.2v13.4l-4.8-4.2H3.5z" fill="currentColor"/><path d="M15.4 9.2a4 4 0 0 1 0 5.6"/><path d="M18.2 6.6a7.6 7.6 0 0 1 0 10.8"/></svg>`;
+
+const ICON_SOUND_OFF = `<svg class="sound-off" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 9.5h3.2l4.8-4.2v13.4l-4.8-4.2H3.5z" fill="currentColor"/><path d="M15.5 9.5l5 5M20.5 9.5l-5 5"/></svg>`;
+
 function head({ lang, page, title, description, extra = '' }) {
   const t = TEXT[lang];
   const other = lang === 'en' ? 'fr' : 'en';
@@ -195,12 +204,17 @@ function homePage(lang) {
     title: h.title,
     description: h.description,
     extra: `<script>(function(d){d.classList.add('js');if(window.chrome&&CSS.supports('backdrop-filter','blur(1px)'))d.classList.add('refract');setTimeout(function(){d.classList.add('is-ready')},4000)})(document.documentElement)</script>
-<link rel="preload" href="${asset('home.js')}" as="script">
+<link rel="modulepreload" href="${asset('home.js')}">
+<link rel="modulepreload" href="${asset('arkal-sound.js')}">
 `,
   })}
 <body class="home">
 <canvas class="orb-canvas" aria-hidden="true"></canvas>
 <div class="orb-fallback" aria-hidden="true"></div>
+<button class="sound-toggle reveal" type="button" aria-pressed="false" aria-label="${t.sound.mute}" data-label-mute="${t.sound.mute}" data-label-unmute="${t.sound.unmute}">
+  ${ICON_SOUND_ON}
+  ${ICON_SOUND_OFF}
+</button>
 <main class="hero">
   <div class="stage">
     <div class="logo-wrap">${LOGO}</div>
@@ -222,7 +236,7 @@ ${footer(lang, 'home')}
     <feDisplacementMap in="SourceGraphic" in2="soft" scale="22" xChannelSelector="R" yChannelSelector="G"/>
   </filter>
 </svg>
-<script src="${asset('home.js')}" defer></script>
+<script type="module" src="${asset('home.js')}"></script>
 </body>
 </html>
 `;
@@ -278,7 +292,7 @@ function notFoundPage() {
 rmSync(OUT, { recursive: true, force: true });
 mkdirSync(OUT, { recursive: true });
 cpSync(join(SRC, 'public'), OUT, { recursive: true });
-cpSync(join(SRC, 'assets'), join(OUT, 'assets'), { recursive: true });
+for (const [name, data] of Object.entries(assetFiles)) write(`assets/${name}`, data);
 
 const legal = { terms: splitLegal('terms.md'), privacy: splitLegal('privacy-policy.md') };
 
