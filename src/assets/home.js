@@ -301,6 +301,7 @@ void main(){
     started = true;
     resize();
     root.classList.add('is-ready');
+    if (!sound.muted) firstInteraction(); // tente de lancer l'ambiance sans interaction
     if (!ctx) return;
     if (reducedMotion) {
       draw(performance.now() / 1000);
@@ -341,10 +342,12 @@ void main(){
   try {
     muted = localStorage.getItem('arkal-muted') === '1';
   } catch (e) {}
-  const sound = new ArkalSound({ muted });
+  // Battement raccourci : montée 0,6 s + décroissance 4,4 s + extinction 2 s = 7 s.
+  const sound = new ArkalSound({ muted, settings: { beatDecay: 4.4, beatFadeOut: 2 } });
 
-  // L'ambiance démarre à la première interaction. Sur iPhone, un toucher n'autorise le son qu'au
-  // relâchement (pointerup / touchend / click) : on écoute donc aussi ces événements.
+  // L'ambiance essaie de démarrer dès l'arrivée (voir start()). La plupart des navigateurs bloquent
+  // le son tant que le visiteur n'a pas interagi : elle démarre alors à la première interaction.
+  // Sur iPhone, un toucher n'autorise le son qu'au relâchement (pointerup / touchend / click).
   const unlockEvents = ['pointerdown', 'pointerup', 'touchend', 'click', 'keydown'];
   const firstInteraction = () => {
     if (!sound.muted) sound.unlock();
