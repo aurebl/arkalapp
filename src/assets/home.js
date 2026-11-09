@@ -137,7 +137,9 @@ void main(){
   function initGL() {
     let gl;
     try {
-      gl = canvas.getContext('webgl', { premultipliedAlpha: false, alpha: true, antialias: true });
+      // Canvas opaque (mode uAlpha = 0 du shader) : rien n'est derrière l'orbe depuis le retrait du mockup,
+      // et Safari iOS affiche mal un canvas transparent non prémultiplié (halo délavé sur tout l'écran).
+      gl = canvas.getContext('webgl', { alpha: false, antialias: true });
     } catch (e) {
       return null;
     }
@@ -181,7 +183,7 @@ void main(){
     gl.uniform1f(u.uFade, 0);
     gl.uniform1f(u.uRot, 0);
     gl.uniform1f(u.uShockD, 1.6);
-    gl.uniform1f(u.uAlpha, 1);
+    gl.uniform1f(u.uAlpha, 0);
     return { gl, u };
   }
 

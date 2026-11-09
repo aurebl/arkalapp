@@ -124,6 +124,7 @@ function head({ lang, page, title, description, extra = '' }) {
 <html lang="${lang}">
 <head>
 <meta charset="utf-8">
+<script>if(location.protocol==='http:'&&/arkalapp\.com$/.test(location.hostname))location.replace('https://arkalapp.com'+location.pathname+location.search+location.hash)</script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>${esc(title)}</title>
 <meta name="description" content="${esc(description)}">
