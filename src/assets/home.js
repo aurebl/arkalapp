@@ -64,6 +64,8 @@ float shape(float a,float t){
   return r+m*uAmp;
 }
 float hash(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
+// pow(x, 2.) n'est pas défini pour x < 0 en GLSL (NaN sur les GPU Apple) : on calcule x * x.
+float sq(float x){return x*x;}
 void main(){
   vec2 uv=(gl_FragCoord.xy-uCenter)/uUnit;
   float t=uT;
@@ -92,15 +94,15 @@ void main(){
   vec2 cd=vec2(cos(.62+sw),sin(.62+sw));
   vec2 qc=uv/R0-vec2(.12,-.08);
   float along=dot(qc,cd),perp=dot(qc,vec2(-cd.y,cd.x))-.08*along*along;
-  float crease=exp(-pow(perp/(.05+.12*max(along,0.)),2.))*smoothstep(.05,.45,along)*smoothstep(1.,.6,along);
+  float crease=exp(-sq(perp/(.05+.12*max(along,0.))))*smoothstep(.05,.45,along)*smoothstep(1.,.6,along);
   col+=mix(cRose,cViolet,.35)*crease*.38;
   col=mix(col,mix(cOrange,cCreme,.45),smoothstep(.0,.25,-perp)*smoothstep(.25,.8,along)*smoothstep(.55,.0,depth)*.35);
   vec2 sc=uv/R0-vec2(.15,.2);
-  float sh=exp(-pow((length(sc)-1.)/.07,2.))*aw(atan(sc.y,sc.x),-2.25,.45);
+  float sh=exp(-sq((length(sc)-1.)/.07))*aw(atan(sc.y,sc.x),-2.25,.45);
   col=mix(col,mix(cCyan,vec3(1.),.6),sh*.5*step(0.,-d));
   float rr=L/Rs;
   float fin=age*.42;
-  float inr=exp(-pow((rr-fin)/.07,2.))*exp(-age*.7)*smoothstep(1.05,.6,rr);
+  float inr=exp(-sq((rr-fin)/.07))*exp(-age*.7)*smoothstep(1.05,.6,rr);
   col+=mix(hc,cCyan,.3)*inr*.12*uRings;
   col+=mix(hc,vec3(1.),uRimW)*exp(-abs(d)/.0035)*.55;
   float px=1.5/uUnit;
@@ -112,8 +114,8 @@ void main(){
   for(int k=0;k<3;k++){
     float ag=age+float(k)*uP;
     float front=ag*.085*gs+uPush*gs;
-    float env=exp(-pow((od-front)/(.045*gs),2.))*exp(-ag*.5)*smoothstep(0.,.6,ag);
-    float crest=pow(.5+.5*cos((od-front)*PI*2./(.05*gs)),8.);
+    float env=exp(-sq((od-front)/(.045*gs)))*exp(-ag*.5)*smoothstep(0.,.6,ag);
+    float crest=pow(max(.5+.5*cos((od-front)*PI*2./(.05*gs)),0.),8.);
     rip+=hc*crest*env;
   }
   rip*=.3*uRings*step(0.,d); // (site) ondes à pleine intensité aussi sous l'orbe : l'app les atténuait à 30 % vers le bas
@@ -122,7 +124,7 @@ void main(){
     float st=uShockT-float(k)*.15;
     if(st>0.&&st<1.4){
       float p=st/1.4,e=1.-pow(1.-p,3.),r=e*uShockD,w=mix(3.,1.,p)*uPt;
-      shock+=mix(hc,vec3(1.),.35)*exp(-pow((od-r)/(w*.6),2.))*.9*(1.-p)*(k==0?1.:.45);
+      shock+=mix(hc,vec3(1.),.35)*exp(-sq((od-r)/(w*.6)))*.9*(1.-p)*(k==0?1.:.45);
     }
   }
   vec2 q=gl_FragCoord.xy/uRes;
@@ -292,8 +294,15 @@ void main(){
     resize();
     root.classList.add('is-ready');
     if (!ctx) return;
-    if (reducedMotion) draw(performance.now() / 1000);
-    else loop(!document.hidden);
+    if (reducedMotion) {
+      draw(performance.now() / 1000);
+      return;
+    }
+    // Même réaction qu'un toucher au centre de l'orbe, en même temps que son apparition en fondu.
+    hitT0 = performance.now() / 1000;
+    omni = true;
+    hitA = 0;
+    loop(!document.hidden);
   }
 
   // ---------- Interaction ----------
