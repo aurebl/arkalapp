@@ -1,0 +1,554 @@
+/* ---------- Base ---------- */
+
+:root {
+  --black: #000000;
+  --white: #ffffff;
+  --grey-light: #b2b2b2;
+  --grey: #808080;
+  --line: #1a1a1a;
+  --block: #0f0f0f;
+  --font: 'Geist', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  color-scheme: dark;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  background: var(--black);
+  color: var(--white);
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--black);
+  font-family: var(--font);
+  font-weight: 400;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a {
+  color: inherit;
+}
+
+::selection {
+  background: rgba(124, 200, 255, 0.3);
+}
+
+:focus-visible {
+  outline: 2px solid var(--white);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+/* ---------- Pied de page (toutes les pages) ---------- */
+
+.footer {
+  position: relative;
+  z-index: 2;
+  flex: none;
+  padding: 96px 20px 32px;
+  padding-bottom: max(32px, env(safe-area-inset-bottom));
+  text-align: center;
+  font-size: 14px;
+  line-height: 20px;
+  letter-spacing: -0.01em;
+  color: var(--grey);
+}
+
+.footer-links {
+  display: flex;
+  justify-content: center;
+  gap: 32px;
+}
+
+.footer a {
+  color: var(--grey);
+  transition: color 0.2s ease;
+}
+
+.footer-links a {
+  text-decoration: none;
+}
+
+.footer a:hover {
+  color: var(--white);
+}
+
+.footer-meta {
+  margin: 12px 0 0;
+  color: #4d4d4d;
+}
+
+.footer-meta a {
+  color: #4d4d4d;
+}
+
+.lang-switch {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+
+/* ---------- Accueil ---------- */
+
+.home {
+  /* Espace boutons → pied de page : 96 px, réduit quand la hauteur d'écran manque. */
+  --foot-gap: clamp(40px, calc(100vh - 824px), 96px);
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+}
+
+@supports (height: 100dvh) {
+  .home {
+    --foot-gap: clamp(40px, calc(100dvh - 824px), 96px);
+  }
+}
+
+.home .footer {
+  padding-top: var(--foot-gap);
+}
+
+.orb-canvas {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  display: block;
+  width: 100%;
+  height: 100%;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.no-webgl .orb-canvas {
+  display: none;
+}
+
+/* Repli sans WebGL : dégradé radial statique aux couleurs de l'orbe. */
+.orb-fallback {
+  display: none;
+  position: fixed;
+  z-index: 1;
+  left: var(--orb-x, 50%);
+  top: var(--orb-y, 30%);
+  width: calc(var(--orb-r, 170px) * 2.5);
+  height: calc(var(--orb-r, 170px) * 2.5);
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  pointer-events: none;
+  background: conic-gradient(#d37bc4 0deg, #db74ba 15deg, #fff4c8 47deg, #ff8a3d 81deg, #b85ef4 124deg, #1f4bff 176deg, #5290ff 228deg, #1f4bff 270deg, #4842ea 310deg, #7a36d0 344deg, #d37bc4 360deg);
+  -webkit-mask-image: radial-gradient(closest-side, transparent 0 66%, rgba(0, 0, 0, 0.35) 76%, #000 80%, rgba(0, 0, 0, 0.3) 85%, transparent 100%);
+  mask-image: radial-gradient(closest-side, transparent 0 66%, rgba(0, 0, 0, 0.35) 76%, #000 80%, rgba(0, 0, 0, 0.3) 85%, transparent 100%);
+}
+
+.no-webgl .orb-fallback {
+  display: block;
+}
+
+.hero {
+  flex: 1 0 auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.stage {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.logo-wrap {
+  position: absolute;
+  z-index: 2;
+  left: 50%;
+  bottom: var(--orb-b, 253px);
+  transform: translate(-50%, 50%);
+  line-height: 0;
+  color: var(--white);
+  pointer-events: none;
+}
+
+.logo {
+  display: block;
+  width: 102px;
+  height: 14px;
+}
+
+.copy {
+  position: relative;
+  z-index: 2;
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0 20px;
+  text-align: center;
+}
+
+.copy h1 {
+  margin: 0;
+  max-width: 480px;
+  font-weight: 600;
+  font-size: 48px;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+
+/* « Les bonnes fréquences » est plus long que 480 px : on laisse un peu plus de place pour garder 2 lignes. */
+.copy h1:lang(fr) {
+  max-width: 520px;
+}
+
+.lede {
+  margin: 16px 0 0;
+  max-width: 480px;
+  font-size: 16px;
+  line-height: 1.5;
+  letter-spacing: -0.02em;
+  color: var(--grey);
+  text-wrap: pretty;
+}
+
+/* ---------- Boutons « liquid glass » ---------- */
+
+.stores {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  width: 100%;
+  margin-top: 24px;
+}
+
+.store {
+  --glass: 0.75; /* opacité du verre (fond, liseré, reflets), sans toucher au texte ni à l'icône */
+  --rim: 0.45;
+  --sheen: 0.7;
+  position: relative;
+  isolation: isolate;
+  flex: 0 1 200px;
+  max-width: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 8px 20px 8px 12px;
+  border-radius: 999px;
+  color: var(--white);
+  text-decoration: none;
+  background: linear-gradient(180deg, rgb(255 255 255 / calc(0.07 * var(--glass))) 0%, rgb(255 255 255 / calc(0.025 * var(--glass))) 55%, rgb(255 255 255 / calc(0.045 * var(--glass))) 100%);
+  -webkit-backdrop-filter: blur(14px) saturate(170%);
+  backdrop-filter: blur(14px) saturate(170%);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / calc(0.06 * var(--glass))),
+    inset 0 -10px 18px -12px rgb(255 255 255 / calc(0.1 * var(--glass))),
+    inset 0 10px 18px -14px rgba(0, 0, 0, 0.6),
+    0 12px 32px -12px rgba(0, 0, 0, 0.8);
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 0.55s cubic-bezier(0.34, 1.8, 0.5, 1), box-shadow 0.3s ease;
+}
+
+/* Réfraction légère (navigateurs Chromium, qui acceptent un filtre SVG en arrière-plan) */
+.refract .store {
+  -webkit-backdrop-filter: url(#glass-refract) blur(12px) saturate(170%);
+  backdrop-filter: url(#glass-refract) blur(12px) saturate(170%);
+}
+
+/* Liseré spéculaire : fort en haut à gauche, discret en bas */
+.store::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  padding: 1px;
+  border-radius: inherit;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.7) 0%,
+    rgba(255, 255, 255, 0.22) 18%,
+    rgba(255, 255, 255, 0.05) 42%,
+    rgba(255, 255, 255, 0.04) 62%,
+    rgba(255, 255, 255, 0.14) 84%,
+    rgba(255, 255, 255, 0.3) 100%
+  );
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+  opacity: calc(var(--rim) * var(--glass));
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+/* Reflet intérieur du verre bombé */
+.store::after {
+  content: '';
+  position: absolute;
+  inset: 1px;
+  z-index: -1;
+  border-radius: inherit;
+  background:
+    radial-gradient(90% 70% at 22% 0%, rgba(255, 255, 255, 0.13), rgba(255, 255, 255, 0) 70%),
+    radial-gradient(70% 60% at 85% 110%, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0) 70%);
+  opacity: calc(var(--sheen) * var(--glass));
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+@media (hover: hover) {
+  .store:hover {
+    --rim: 0.7;
+    --sheen: 1;
+  }
+}
+
+.store:active {
+  transform: scale(0.97);
+  transition: transform 0.12s cubic-bezier(0.2, 0, 0, 1);
+}
+
+.store:focus-visible {
+  outline-offset: 4px;
+  border-radius: 999px;
+}
+
+.store-icon {
+  flex: none;
+  width: 24px;
+  height: 24px;
+}
+
+.store-text {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+  min-width: 0;
+}
+
+.store-small {
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--grey);
+  white-space: nowrap;
+}
+
+.store-big {
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 1.5;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+}
+
+.glass-defs {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+}
+
+/* ---------- Apparition : l'orbe, puis le logo 0,3 s après, puis le reste 0,2 s après ---------- */
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.js .orb-canvas,
+.js .orb-fallback,
+.js .logo-wrap,
+.js .reveal {
+  opacity: 0;
+}
+
+.js.is-ready .orb-canvas,
+.js.is-ready .orb-fallback {
+  animation: fade-in 1s ease-out both;
+}
+
+.js.is-ready .logo-wrap {
+  animation: fade-in 0.6s ease-out 0.3s both;
+}
+
+.js.is-ready .reveal {
+  animation: fade-in 0.6s ease-out 0.5s both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .store,
+  .store:active {
+    transition: none;
+    transform: none;
+  }
+}
+
+/* ---------- Accueil mobile ---------- */
+
+@media (max-width: 767px) {
+  .copy h1 {
+    font-size: 32px;
+  }
+  .stores {
+    flex-direction: column;
+    gap: 12px;
+  }
+  .store {
+    flex: none;
+    width: 100%;
+    max-width: none;
+  }
+  .home .footer {
+    padding-top: 40px;
+  }
+}
+
+/* ---------- Pages légales ---------- */
+
+.legal {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.legal-main {
+  flex: 1 0 auto;
+  width: 100%;
+  max-width: 720px; /* 680 px de texte + 2 × 20 px de marge */
+  margin: 0 auto;
+  padding: 120px 20px 0;
+}
+
+.back {
+  display: inline-block;
+  margin-bottom: 40px;
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--grey);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.back:hover {
+  color: var(--white);
+}
+
+.legal h1 {
+  margin: 0;
+  font-weight: 600;
+  font-size: 40px;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+
+.effective {
+  margin: 12px 0 0;
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--grey);
+}
+
+.prose {
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--grey-light);
+  overflow-wrap: break-word;
+}
+
+.prose h3 {
+  margin: 48px 0 12px;
+  font-weight: 600;
+  font-size: 20px;
+  line-height: 1.4;
+  letter-spacing: -0.01em;
+  color: var(--white);
+}
+
+.prose p,
+.prose ul {
+  margin: 0 0 16px;
+}
+
+.prose ul {
+  padding-left: 1.25em;
+}
+
+.prose li + li {
+  margin-top: 6px;
+}
+
+.prose li::marker {
+  color: var(--grey);
+}
+
+.prose strong {
+  font-weight: 600;
+  color: var(--white);
+}
+
+.prose a {
+  color: var(--white);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+
+.table-wrap {
+  margin: 0 0 16px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.prose table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.prose th,
+.prose td {
+  padding: 12px;
+  text-align: left;
+  vertical-align: top;
+  border-bottom: 1px solid var(--line);
+}
+
+.prose th {
+  font-weight: 500;
+  color: var(--white);
+}
+
+.prose td {
+  color: var(--grey-light);
+}
+
+.prose > :last-child {
+  margin-bottom: 0;
+}
+
+@media (max-width: 767px) {
+  .legal-main {
+    padding-top: 80px;
+  }
+  .legal h1 {
+    font-size: 32px;
+  }
+  .prose table {
+    min-width: 560px;
+  }
+}
