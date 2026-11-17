@@ -4,10 +4,10 @@
 
 export const SITE_URL = 'https://arkalapp.com';
 
-// Liens de téléchargement : remplace ces deux valeurs par les vrais liens quand l'app sera publiée.
+// Liens de téléchargement (identifiant Apple 6830111765, package Android com.abdesign.arkal).
 export const STORE_LINKS = {
-  appStore: '#app-store',
-  googlePlay: '#google-play',
+  appStore: 'https://apps.apple.com/app/id6830111765',
+  googlePlay: 'https://play.google.com/store/apps/details?id=com.abdesign.arkal',
 };
 
 export const CONTACT_EMAIL = 'hello@arkalapp.com';
