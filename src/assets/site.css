@@ -284,8 +284,8 @@ a {
 
 .store {
   --glass: 0.75; /* opacité du verre (fond, liseré, reflets), sans toucher au texte ni à l'icône */
-  --rim: 0.45;
-  --sheen: 0.7;
+  --rim: 0.7;
+  --sheen: 1;
   position: relative;
   isolation: isolate;
   flex: 0 1 200px;
@@ -358,8 +358,8 @@ a {
 
 @media (hover: hover) {
   .store:hover {
-    --rim: 0.7;
-    --sheen: 1;
+    --rim: 1;
+    --sheen: 1.3;
   }
 }
 
